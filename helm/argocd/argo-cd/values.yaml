@@ -3354,7 +3354,7 @@ notifications:
 
   notifiers:
     service.webhook.slack: |
-      url: $slack-webhook:slack-webhook-url
+      url: $slack-webhook: url
       headers:
       - name: Content-Type
         value: application/json
