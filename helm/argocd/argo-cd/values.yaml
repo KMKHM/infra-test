@@ -3354,7 +3354,7 @@ notifications:
 
   notifiers:
     service.webhook.slack: |
-      url: $slack-webhook-url
+      url: $argocd-notifications-secret:slack-webhook-url
       headers:
       - name: Content-Type
         value: application/json
