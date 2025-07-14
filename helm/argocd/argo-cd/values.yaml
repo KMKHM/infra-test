@@ -3351,8 +3351,7 @@ notifications:
   # -- Enable notifications controller
   enabled: true
   argocdUrl: "http://34.64.188.193:30081"
-
-  notifiers:
+  data:
     service.webhook.slack: |
       url: $argocd-notifications-secret:slack-webhook-url
       headers:
@@ -3378,14 +3377,14 @@ notifications:
               "color": "#E96D76"
             }]
     template.app-sync-running: |
-    webhook:
-      slack:
-        attachments: |
-          [{
-            "title": "배포 중",
-            "text": "{{.app.metadata.name}} 애플리케이션 배포가 진행 중입니다...",
-            "color": "warning"
-          }]
+      webhook:
+        slack:
+          attachments: |
+            [{
+              "title": "배포 중",
+              "text": "{{.app.metadata.name}} 애플리케이션 배포가 진행 중입니다...",
+              "color": "warning"
+            }]
 
 
   triggers:
