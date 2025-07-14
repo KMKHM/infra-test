@@ -3354,45 +3354,90 @@ notifications:
     create: false
   cm:
     create: true
-    context: |
-      argocdUrl: "http://34.64.188.193:30081"
-    service.slack: |
-      url: $argocd-notifications-secret:slack-webhook-url
-    template.app-deployed: |
-      slack:
-        text: "✅ Application {{.app.metadata.name}} deployed successfully!"
-    template.app-sync-failed: |
-      slack:
-        text: "❌ Application {{.app.metadata.name}} sync failed!"
-    template.app-sync-running: |
-      slack:
-        text: "🔄 Application {{.app.metadata.name}} is syncing..."
-    trigger.on-deployed: |
-      - description: Application is synced and healthy
-        send:
-        - app-deployed
-        when: app.status.operationState.phase in ['Succeeded'] and app.status.health.status == 'Healthy'
-    trigger.on-sync-failed: |
-      - description: Application syncing has failed
-        send:
-        - app-sync-failed
-        when: app.status.operationState.phase in ['Error', 'Failed']
-    trigger.on-sync-running: |
-      - description: Application is being synced
-        send:
-        - app-sync-running
-        when: app.status.operationState.phase in ['Running']
-    subscriptions: |
-      - recipients:
-        - slack:deployment
-        triggers:
-        - on-deployed
-        - on-sync-failed
-        - on-sync-running
+    config.yaml: |
+      service.slack: |
+        webhook: $slack-webhook-url
       
-      when: app.status.operationState.phase in ['Running']
-
-
+      template.app-deployed: |
+        slack:
+          attachments: |
+            [{
+              "title": "{{.app.metadata.name}} 배포 성공",
+              "color": "good",
+              "fields": [
+                {
+                  "title": "동기화 상태",
+                  "value": "{{.app.status.sync.status}}",
+                  "short": true
+                },
+                {
+                  "title": "헬스 상태", 
+                  "value": "{{.app.status.health.status}}",
+                  "short": true
+                },
+                {
+                  "title": "저장소",
+                  "value": "{{.app.spec.source.repoURL}}",
+                  "short": true
+                },
+                {
+                  "title": "리비전",
+                  "value": "{{.app.status.sync.revision}}",
+                  "short": true
+                }
+              ]
+            }]
+      
+      template.app-sync-failed: |
+        slack:
+          attachments: |
+            [{
+              "title": "{{.app.metadata.name}} 동기화 실패",
+              "color": "danger",
+              "fields": [
+                {
+                  "title": "동기화 상태",
+                  "value": "{{.app.status.sync.status}}",
+                  "short": true
+                },
+                {
+                  "title": "저장소",
+                  "value": "{{.app.spec.source.repoURL}}",
+                  "short": true
+                }
+              ]
+            }]
+      
+      template.app-sync-running: |
+        slack:
+          attachments: |
+            [{
+              "title": "{{.app.metadata.name}} 동기화 진행 중",
+              "color": "warning",
+              "fields": [
+                {
+                  "title": "동기화 상태",
+                  "value": "{{.app.status.sync.status}}",
+                  "short": true
+                },
+                {
+                  "title": "저장소",
+                  "value": "{{.app.spec.source.repoURL}}",
+                  "short": true
+                }
+              ]
+            }]
+      
+      subscriptions: |
+        - recipients:
+          - slack:deployment
+          triggers:
+          - on-deployed
+          - on-sync-failed
+          - on-sync-running
+  
+  
+  
 
   # -- Notifications controller name string
   name: notifications-controller
