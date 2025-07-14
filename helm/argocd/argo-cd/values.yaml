@@ -2277,11 +2277,11 @@ server:
     # -- Server service labels
     labels: {}
     # -- Server service type
-    type: ClusterIP
+    type: NodePort
     # -- Server service http port for NodePort service type (only if `server.service.type` is set to "NodePort")
-    nodePortHttp: 30080
+    nodePortHttp: 30081
     # -- Server service https port for NodePort service type (only if `server.service.type` is set to "NodePort")
-    nodePortHttps: 30443
+    nodePortHttps: 30082
     # -- Server service http port
     servicePortHttp: 80
     # -- Server service https port
