@@ -3347,94 +3347,155 @@ applicationSet:
   # -- Enable ApplicationSet in any namespace feature
   allowAnyNamespace: false
 ## Notifications controller
+
+# 기존 values.yaml에 추가
+
 notifications:
   # -- Enable notifications controller
   enabled: true
+
   secret:
-    create: false
-  cm:
     create: true
-    config.yaml: |
-      service.slack: |
-        webhook: $slack-webhook-url
-      
-      template.app-deployed: |
-        slack:
-          attachments: |
-            [{
-              "title": "{{.app.metadata.name}} 배포 성공",
-              "color": "good",
-              "fields": [
-                {
-                  "title": "동기화 상태",
-                  "value": "{{.app.status.sync.status}}",
-                  "short": true
-                },
-                {
-                  "title": "헬스 상태", 
-                  "value": "{{.app.status.health.status}}",
-                  "short": true
-                },
-                {
-                  "title": "저장소",
-                  "value": "{{.app.spec.source.repoURL}}",
-                  "short": true
-                },
-                {
-                  "title": "리비전",
-                  "value": "{{.app.status.sync.revision}}",
-                  "short": true
-                }
-              ]
-            }]
-      
-      template.app-sync-failed: |
-        slack:
-          attachments: |
-            [{
-              "title": "{{.app.metadata.name}} 동기화 실패",
-              "color": "danger",
-              "fields": [
-                {
-                  "title": "동기화 상태",
-                  "value": "{{.app.status.sync.status}}",
-                  "short": true
-                },
-                {
-                  "title": "저장소",
-                  "value": "{{.app.spec.source.repoURL}}",
-                  "short": true
-                }
-              ]
-            }]
-      
-      template.app-sync-running: |
-        slack:
-          attachments: |
-            [{
-              "title": "{{.app.metadata.name}} 동기화 진행 중",
-              "color": "warning",
-              "fields": [
-                {
-                  "title": "동기화 상태",
-                  "value": "{{.app.status.sync.status}}",
-                  "short": true
-                },
-                {
-                  "title": "저장소",
-                  "value": "{{.app.spec.source.repoURL}}",
-                  "short": true
-                }
-              ]
-            }]
-      
-      subscriptions: |
-        - recipients:
-          - slack:deployment
-          triggers:
-          - on-deployed
-          - on-sync-failed
-          - on-sync-running
+    name: argocd-notifications-secret
+
+  notifiers:
+    service.slack: |
+      token: $slack-token
+      username: ArgoCD
+      icon: https://argo-cd.readthedocs.io/en/stable/assets/logo.png
+
+  templates:
+    template.app-deployed: |
+      slack:
+        attachments: |
+          [{
+            "title": "{{.app.metadata.name}} 배포 성공",
+            "color": "good",
+            "fields": [
+              {
+                "title": "동기화 상태",
+                "value": "{{.app.status.sync.status}}",
+                "short": true
+              },
+              {
+                "title": "헬스 상태", 
+                "value": "{{.app.status.health.status}}",
+                "short": true
+              },
+              {
+                "title": "저장소",
+                "value": "{{.app.spec.source.repoURL}}",
+                "short": true
+              },
+              {
+                "title": "리비전",
+                "value": "{{.app.status.sync.revision}}",
+                "short": true
+              }
+            ]
+          }]
+
+    template.app-sync-failed: |
+      slack:
+        attachments: |
+          [{
+            "title": "{{.app.metadata.name}} 동기화 실패",
+            "color": "danger",
+            "fields": [
+              {
+                "title": "동기화 상태",
+                "value": "{{.app.status.sync.status}}",
+                "short": true
+              },
+              {
+                "title": "저장소",
+                "value": "{{.app.spec.source.repoURL}}",
+                "short": true
+              },
+              {
+                "title": "오류 메시지",
+                "value": "{{.app.status.operationState.message}}",
+                "short": false
+              }
+            ]
+          }]
+
+    template.app-sync-running: |
+      slack:
+        attachments: |
+          [{
+            "title": "{{.app.metadata.name}} 동기화 진행 중",
+            "color": "warning",
+            "fields": [
+              {
+                "title": "동기화 상태",
+                "value": "{{.app.status.sync.status}}",
+                "short": true
+              },
+              {
+                "title": "저장소",
+                "value": "{{.app.spec.source.repoURL}}",
+                "short": true
+              }
+            ]
+          }]
+
+    template.app-healthy: |
+      slack:
+        attachments: |
+          [{
+            "title": "{{.app.metadata.name}} 정상 상태",
+            "color": "good",
+            "fields": [
+              {
+                "title": "헬스 상태",
+                "value": "{{.app.status.health.status}}",
+                "short": true
+              },
+              {
+                "title": "동기화 상태",
+                "value": "{{.app.status.sync.status}}",
+                "short": true
+              }
+            ]
+          }]
+
+  triggers:
+    trigger.on-deployed: |
+      - description: Application is synced and healthy after any operation.
+        send:
+        - app-deployed
+        when: |
+          app.status.operationState.phase == 'Succeeded' and
+          app.status.health.status == 'Healthy' and
+          app.status.operationState != null
+
+    trigger.on-sync-failed: |
+      - description: Application syncing has failed
+        send:
+        - app-sync-failed
+        when: app.status.operationState.phase in ['Error', 'Failed']
+
+    trigger.on-sync-running: |
+      - description: Application is being synced
+        send:
+        - app-sync-running
+        when: app.status.operationState.phase in ['Running']
+
+    trigger.test-notification: |
+      - description: 테스트 알림 - 애플리케이션이 정상 상태일 때
+        send:
+        - app-healthy
+        when: "true"
+
+  subscriptions:
+    - recipients:
+        - slack:#deployment
+      triggers:
+        - on-deployed
+        - on-sync-failed
+        - on-sync-running
+        - test-notification
   
   
   
