@@ -3353,10 +3353,12 @@ applicationSet:
 notifications:
   # -- Enable notifications controller
   enabled: true
+  cm:
+    create: true
 
   secret:
     create: true
-    name: argocd-notifications-secret
+#    name: argocd-notifications-secret
 
   notifiers:
     service.slack: |
