@@ -9,6 +9,12 @@ image:
 imagePullSecrets: # 이 이름의 secret을 네임스페이스에서 찾음
   - name: ghcr-secret
 
+podAnnotations:
+  argocd-image-updater.argoproj.io/image-list: myapp=ghcr.io/kmkhm/my-java-image
+  argocd-image-updater.argoproj.io/write-back-method: git
+  argocd-image-updater.argoproj.io/git-branch: main
+
+
 nameOverride: "cicd-test-app"
 fullnameOverride: "cicd-test-app"
 
@@ -18,7 +24,6 @@ serviceAccount:
   annotations: {}
   name: ""
 
-podAnnotations: {}
 podLabels: {}
 
 podSecurityContext: {}
