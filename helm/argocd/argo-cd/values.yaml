@@ -3350,69 +3350,48 @@ applicationSet:
 notifications:
   # -- Enable notifications controller
   enabled: true
-  argocdUrl: "http://34.64.188.193:30081"
-  data:
+  secret:
+    create: false
+  cm:
+    create: true
+    context: |
+      argocdUrl: "http://34.64.188.193:30081"
     service.slack: |
       url: $argocd-notifications-secret:slack-webhook-url
-      headers:
-      - name: Content-Type
-        value: application/json
-
-  templates:
     template.app-deployed: |
-      webhook:
-        slack:
-          attachments: |
-            [{
-              "text": "{{.app.metadata.name}} 배포 성공",
-              "color": "#36a64f"
-            }]
-
+      slack:
+        text: "✅ Application {{.app.metadata.name}} deployed successfully!"
     template.app-sync-failed: |
-      webhook:
-        slack:
-          attachments: |
-            [{
-              "text": "{{.app.metadata.name}} 배포 실패",
-              "color": "#E96D76"
-            }]
+      slack:
+        text: "❌ Application {{.app.metadata.name}} sync failed!"
     template.app-sync-running: |
-      webhook:
-        slack:
-          attachments: |
-            [{
-              "title": "배포 중",
-              "text": "{{.app.metadata.name}} 애플리케이션 배포가 진행 중입니다...",
-              "color": "warning"
-            }]
-
-
-  triggers:
+      slack:
+        text: "🔄 Application {{.app.metadata.name}} is syncing..."
     trigger.on-deployed: |
       - description: Application is synced and healthy
         send:
         - app-deployed
         when: app.status.operationState.phase in ['Succeeded'] and app.status.health.status == 'Healthy'
-
     trigger.on-sync-failed: |
       - description: Application syncing has failed
         send:
         - app-sync-failed
         when: app.status.operationState.phase in ['Error', 'Failed']
-
     trigger.on-sync-running: |
       - description: Application is being synced
         send:
         - app-sync-running
         when: app.status.operationState.phase in ['Running']
-
-  subscriptions:
-    - recipients:
-        - slack:deployment  # 실제 채널명에 맞게 수정
-      triggers:
+    subscriptions: |
+      - recipients:
+        - slack:deployment
+        triggers:
         - on-deployed
         - on-sync-failed
         - on-sync-running
+      
+      when: app.status.operationState.phase in ['Running']
+
 
 
   # -- Notifications controller name string
@@ -3500,24 +3479,7 @@ notifications:
     # region: east
     # environmentName: staging
 
-  secret:
-    # -- Whether helm chart creates notifications controller secret
-    ## If true, will create a secret with the name below. Otherwise, will assume existence of a secret with that name.
-    create: true
 
-    # -- notifications controller Secret name
-    name: "argocd-notifications-secret"
-
-    # -- key:value pairs of annotations to be added to the secret
-    annotations: {}
-
-    # -- key:value pairs of labels to be added to the secret
-    labels: {}
-
-    # -- Generic key:value pairs to be inserted into the secret
-    ## Can be used for templates, notification services etc. Some examples given below.
-    ## For more information: https://argo-cd.readthedocs.io/en/stable/operator-manual/notifications/services/overview/
-    items: {}
       # slack-token:
       #   # For more information: https://argo-cd.readthedocs.io/en/stable/operator-manual/notifications/services/slack/
 
@@ -3696,9 +3658,7 @@ notifications:
     # -- Automount API credentials for the Service Account
     automountServiceAccountToken: true
 
-  cm:
-    # -- Whether helm chart creates notifications controller config map
-    create: true
+
 
   ## Enable this and set the rules: to whatever custom rules you want for the Cluster Role resource.
   ## Defaults to off
