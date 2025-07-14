@@ -3408,7 +3408,7 @@ notifications:
 
   subscriptions:
     - recipients:
-        - slack:development  # 실제 채널명에 맞게 수정
+        - slack:deployment  # 실제 채널명에 맞게 수정
       triggers:
         - on-deployed
         - on-sync-failed
