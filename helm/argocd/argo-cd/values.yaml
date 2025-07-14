@@ -3357,8 +3357,8 @@ notifications:
     create: true
 
   secret:
-    create: true
-#    name: argocd-notifications-secret
+    create: false
+    name: argocd-notifications-secret
 
   notifiers:
     service.slack: |
