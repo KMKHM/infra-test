@@ -5,9 +5,15 @@ metadata:
   namespace: argocd
   annotations:
     argocd-image-updater.argoproj.io/image-list: myapp=ghcr.io/kmkhm/my-java-image
+    argocd-image-updater.argoproj.io/myapp.helm.image-name: image.repository
+    argocd-image-updater.argoproj.io/myapp.helm.image-tag: image.tag
+    argocd-image-updater.argoproj.io/myapp.update-strategy: latest
+    argocd-image-updater.argoproj.io/myapp.pull-secret: pullsecret:argocd/ghcr-secret
     argocd-image-updater.argoproj.io/write-back-method: git
     argocd-image-updater.argoproj.io/git-branch: main
-    argocd-image-updater.argoproj.io/myapp.pull-secret: ghcr-secret
+    argocd-image-updater.argoproj.io/git-repository: https://github.com/KMKHM/infra-test.git
+
+
 
 spec:
   project: default
