@@ -6,7 +6,7 @@ image:
   pullPolicy: Always
   tag: "latest"
 
-imagePullSecrets:
+imagePullSecrets: # 이 이름의 secret을 네임스페이스에서 찾음
   - name: ghcr-secret
 
 nameOverride: "cicd-test-app"
@@ -27,7 +27,7 @@ securityContext: {}
 service:
   type: NodePort
   port: 80
-  targetPort: 8080
+  targetPort: 9000
   nodePort: 30080
 
 ingress:
