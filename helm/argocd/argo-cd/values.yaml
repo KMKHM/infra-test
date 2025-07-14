@@ -3352,7 +3352,7 @@ notifications:
   enabled: true
   argocdUrl: "http://34.64.188.193:30081"
   data:
-    service.webhook.slack: |
+    service.slack: |
       url: $argocd-notifications-secret:slack-webhook-url
       headers:
       - name: Content-Type
