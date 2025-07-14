@@ -3377,6 +3377,16 @@ notifications:
               "text": "{{.app.metadata.name}} 배포 실패",
               "color": "#E96D76"
             }]
+    template.app-sync-running: |
+    webhook:
+      slack:
+        attachments: |
+          [{
+            "title": "배포 중",
+            "text": "{{.app.metadata.name}} 애플리케이션 배포가 진행 중입니다...",
+            "color": "warning"
+          }]
+
 
   triggers:
     trigger.on-deployed: |
@@ -3391,12 +3401,20 @@ notifications:
         - app-sync-failed
         when: app.status.operationState.phase in ['Error', 'Failed']
 
+    trigger.on-sync-running: |
+      - description: Application is being synced
+        send:
+        - app-sync-running
+        when: app.status.operationState.phase in ['Running']
+
   subscriptions:
     - recipients:
         - slack:development  # 실제 채널명에 맞게 수정
       triggers:
         - on-deployed
         - on-sync-failed
+        - on-sync-running
+
 
   # -- Notifications controller name string
   name: notifications-controller
