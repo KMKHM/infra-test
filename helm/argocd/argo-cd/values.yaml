@@ -3350,13 +3350,60 @@ applicationSet:
 notifications:
   # -- Enable notifications controller
   enabled: true
+  argocdUrl: "http://34.64.188.193:30081"
+
+  notifiers:
+    service.webhook.slack: |
+      url: https://hooks.slack.com/services/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
+      headers:
+      - name: Content-Type
+        value: application/json
+
+  templates:
+    template.app-deployed: |
+      webhook:
+        slack:
+          attachments: |
+            [{
+              "text": "{{.app.metadata.name}} 배포 성공",
+              "color": "#36a64f"
+            }]
+
+    template.app-sync-failed: |
+      webhook:
+        slack:
+          attachments: |
+            [{
+              "text": "{{.app.metadata.name}} 배포 실패",
+              "color": "#E96D76"
+            }]
+
+  triggers:
+    trigger.on-deployed: |
+      - description: Application is synced and healthy
+        send:
+        - app-deployed
+        when: app.status.operationState.phase in ['Succeeded'] and app.status.health.status == 'Healthy'
+
+    trigger.on-sync-failed: |
+      - description: Application syncing has failed
+        send:
+        - app-sync-failed
+        when: app.status.operationState.phase in ['Error', 'Failed']
+
+  subscriptions:
+    - recipients:
+        - slack:development  # 실제 채널명에 맞게 수정
+      triggers:
+        - on-deployed
+        - on-sync-failed
 
   # -- Notifications controller name string
   name: notifications-controller
 
   # -- Argo CD dashboard url; used in place of {{.context.argocdUrl}} in templates
   # @default -- `""` (defaults to https://`global.domain`)
-  argocdUrl: ""
+
 
   # -- Runtime class name for the notifications controller
   # @default -- `""` (defaults to global.runtimeClassName)
@@ -3509,7 +3556,6 @@ notifications:
   # -- Configures notification services such as slack, email or custom webhook
   # @default -- See [values.yaml]
   ## For more information: https://argo-cd.readthedocs.io/en/stable/operator-manual/notifications/services/overview/
-  notifiers: {}
     # service.slack: |
     #   token: $slack-token
 
@@ -3645,7 +3691,7 @@ notifications:
 
   # -- Contains centrally managed global application subscriptions
   ## For more information: https://argo-cd.readthedocs.io/en/stable/operator-manual/notifications/subscriptions/
-  subscriptions: []
+
     # # subscription for on-sync-status-unknown trigger notifications
     # - recipients:
     #   - slack:test2
@@ -3661,7 +3707,7 @@ notifications:
 
   # -- The notification template is used to generate the notification content
   ## For more information: https://argo-cd.readthedocs.io/en/stable/operator-manual/notifications/templates/
-  templates: {}
+
     # template.app-deployed: |
     #   email:
     #     subject: New version of an application {{.app.metadata.name}} is up and running.
@@ -3878,7 +3924,7 @@ notifications:
 
   # -- The trigger defines the condition when the notification should be sent
   ## For more information: https://argo-cd.readthedocs.io/en/stable/operator-manual/notifications/triggers/
-  triggers: {}
+
     # trigger.on-deployed: |
     #   - description: Application is synced and healthy. Triggered once per commit.
     #     oncePer: app.status.sync.revision
