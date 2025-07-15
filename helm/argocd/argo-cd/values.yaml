@@ -3372,7 +3372,7 @@ notifications:
         attachments: |
           [{
             "title": "{{.app.metadata.name}} 배포 성공",
-            "color": "good",
+            "color": "good"
           }]
 
     template.app-sync-failed: |
@@ -3439,7 +3439,7 @@ notifications:
     trigger.on-sync-succeeded: |
       - description: Application syncing has succeeded
         send:
-        - app-deployed
+        - app-sync-succeeded
         when: app.status.operationState.phase == 'Succeeded'
 
     trigger.on-sync-failed: |
@@ -3451,7 +3451,7 @@ notifications:
     trigger.test-notification: |
       - description: 테스트 알림 - 애플리케이션이 정상 상태일 때
         send:
-        - app-healthy
+        - app-test
         when: "true"
 
   subscriptions:
@@ -3459,7 +3459,8 @@ notifications:
         - slack:#deployment
       triggers:
         - on-sync-failed
-        - on-sync-running
+#        - on-sync-running
+        - on-sync-succeeded
         - test-notification
   
   
