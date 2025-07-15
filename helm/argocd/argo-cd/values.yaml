@@ -3462,14 +3462,14 @@ notifications:
   triggers:
     trigger.on-deployed: |
       - description: Application is synced and healthy after any operation.
-      send:
-        - app-deployed
-      oncePer: app.status.reconciledAt
-      when: |
-        app.status.operationState.phase == 'Succeeded' &&
-        app.status.health.status == 'Healthy' &&
-        app.status.sync.status == 'Synced' &&
-        app.status.operationState != null
+        send:
+          - app-deployed
+        oncePer: app.status.reconciledAt
+        when: |
+          app.status.operationState.phase == 'Succeeded' &&
+          app.status.health.status == 'Healthy' &&
+          app.status.sync.status == 'Synced' &&
+          app.status.operationState != null
     trigger.on-sync-succeeded: |
       - description: Application syncing has succeeded
         send:
