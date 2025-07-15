@@ -3461,8 +3461,7 @@ notifications:
         when: |
           app.status.operationState.phase == 'Succeeded' &&
           app.status.health.status == 'Healthy' &&
-          app.status.sync.status == 'Synced' &&
-          app.status.operationState != null
+          app.status.sync.status == 'Synced'
 
     trigger.on-sync-failed: |
       - description: Application syncing has failed
