@@ -3391,13 +3391,6 @@ notifications:
               }
             ]
           }]
-    template.app-sync-succeeded: |
-      slack:
-        attachments: |
-          [{
-            "title": "{{.app.metadata.name}} 배포 성공",
-            "color": "good"
-          }]
 
     template.app-sync-failed: |
       slack:
@@ -3464,17 +3457,12 @@ notifications:
       - description: Application is synced and healthy after any operation.
         send:
           - app-deployed
-        oncePer: app.status.reconciledAt
+        oncePer: app.status.sync.revision
         when: |
           app.status.operationState.phase == 'Succeeded' &&
           app.status.health.status == 'Healthy' &&
           app.status.sync.status == 'Synced' &&
           app.status.operationState != null
-    trigger.on-sync-succeeded: |
-      - description: Application syncing has succeeded
-        send:
-        - app-sync-succeeded
-        when: app.status.operationState.phase == 'Succeeded'
 
     trigger.on-sync-failed: |
       - description: Application syncing has failed
@@ -3493,8 +3481,6 @@ notifications:
         - slack:#deployment
       triggers:
         - on-sync-failed
-#        - on-sync-running
-#        - on-sync-succeeded
         - test-notification
         - on-deployed
   
