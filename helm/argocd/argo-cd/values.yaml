@@ -3385,11 +3385,6 @@ notifications:
                 "short": true
               },
               {
-                "title": "저장소",
-                "value": "{{.app.spec.source.repoURL}}",
-                "short": true
-              },
-              {
                 "title": "리비전",
                 "value": "{{.app.status.sync.revision}}",
                 "short": true
@@ -3422,26 +3417,6 @@ notifications:
             ]
           }]
 
-    template.app-sync-running: |
-      slack:
-        attachments: |
-          [{
-            "title": "{{.app.metadata.name}} 동기화 진행 중",
-            "color": "warning",
-            "fields": [
-              {
-                "title": "동기화 상태",
-                "value": "{{.app.status.sync.status}}",
-                "short": true
-              },
-              {
-                "title": "저장소",
-                "value": "{{.app.spec.source.repoURL}}",
-                "short": true
-              }
-            ]
-          }]
-
     template.app-healthy: |
       slack:
         attachments: |
@@ -3461,28 +3436,34 @@ notifications:
               }
             ]
           }]
+    template.app-test: |
+      slack:
+        attachments: |
+          [{
+            "title": "{{.app.metadata.name}} 테스트 알림",
+            "color": "warning",
+            "fields": [
+              {
+                "title": "상태",
+                "value": "테스트 메시지",
+                "short": true
+              }
+            ]
+          }]
+
 
   triggers:
     trigger.on-deployed: |
       - description: Application is synced and healthy after any operation.
         send:
         - app-deployed
-        when: |
-          app.status.operationState.phase == 'Succeeded' and
-          app.status.health.status == 'Healthy' and
-          app.status.operationState != null
+        when: app.status.operationState.phase == 'Succeeded'
 
     trigger.on-sync-failed: |
       - description: Application syncing has failed
         send:
         - app-sync-failed
         when: app.status.operationState.phase in ['Error', 'Failed']
-
-    trigger.on-sync-running: |
-      - description: Application is being synced
-        send:
-        - app-sync-running
-        when: app.status.operationState.phase in ['Running']
 
     trigger.test-notification: |
       - description: 테스트 알림 - 애플리케이션이 정상 상태일 때
