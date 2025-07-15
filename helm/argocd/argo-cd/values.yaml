@@ -3367,7 +3367,7 @@ notifications:
       icon: https://argo-cd.readthedocs.io/en/stable/assets/logo.png
 
   templates:
-    template.app-deployed: |
+    template.app-sync-succeeded: |
       slack:
         attachments: |
           [{
@@ -3436,14 +3436,11 @@ notifications:
 
 
   triggers:
-    trigger.on-deployed: |
-      - description: Application is synced and healthy after any operation.
+    trigger.on-sync-succeeded: |
+      - description: Application syncing has succeeded
         send:
         - app-deployed
-        when: |
-          app.status.operationState.phase == 'Succeeded' and
-          app.status.health.status != 'Healthy'
-
+        when: app.status.operationState.phase == 'Succeeded'
 
     trigger.on-sync-failed: |
       - description: Application syncing has failed
@@ -3461,7 +3458,6 @@ notifications:
     - recipients:
         - slack:#deployment
       triggers:
-        - on-deployed
         - on-sync-failed
         - on-sync-running
         - test-notification

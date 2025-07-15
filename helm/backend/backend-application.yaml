@@ -10,7 +10,7 @@ metadata:
     argocd-image-updater.argoproj.io/myapp.update-strategy: latest
     argocd-image-updater.argoproj.io/myapp.pull-secret: pullsecret:argocd/ghcr-secret
 
-    notifications.argoproj.io/subscribe.on-deployed.slack: deployment
+#    notifications.argoproj.io/subscribe.on-deployed.slack: deployment
     notifications.argoproj.io/subscribe.on-sync-failed.slack: deployment
     notifications.argoproj.io/subscribe.on-sync-running.slack: deployment
 
