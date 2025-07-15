@@ -3457,7 +3457,7 @@ notifications:
       - description: Application is synced and healthy after any operation.
         send:
           - app-deployed
-        oncePer: app.status.sync.revision
+        oncePer: app.status.operationState.finishedAt
         when: |
           app.status.operationState.phase == 'Succeeded' &&
           app.status.health.status == 'Healthy' &&
