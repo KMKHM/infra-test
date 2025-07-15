@@ -3464,8 +3464,7 @@ notifications:
       - description: Application is synced and healthy after any operation.
         send:
           - app-deployed
-        oncePer: 
-          - app.metadata.generation
+        oncePer: app.metadata.generation
         when: |
           app.status.operationState.phase == 'Succeeded' &&
           app.status.health.status == 'Healthy' &&
