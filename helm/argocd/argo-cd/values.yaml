@@ -3367,6 +3367,32 @@ notifications:
       icon: https://argo-cd.readthedocs.io/en/stable/assets/logo.png
 
   templates:
+
+    templates:
+      template.app-deployed: |
+        slack:
+          attachments: |
+            [{
+              "title": "{{.app.metadata.name}} 배포 성공 🎉",
+              "color": "good",
+              "fields": [
+                {
+                  "title": "Sync 상태",
+                  "value": "{{.app.status.sync.status}}",
+                  "short": true
+                },
+                {
+                  "title": "Health 상태",
+                  "value": "{{.app.status.health.status}}",
+                  "short": true
+                },
+                {
+                  "title": "저장소",
+                  "value": "{{.app.spec.source.repoURL}}",
+                  "short": false
+                }
+              ]
+            }]
     template.app-sync-succeeded: |
       slack:
         attachments: |
@@ -3436,6 +3462,14 @@ notifications:
 
 
   triggers:
+    trigger.on-deployed: |
+      - description: Application is synced and healthy after any operation.
+        send:
+          - app-deployed
+        when: |
+          app.status.operationState.phase == 'Succeeded' &&
+          app.status.health.status == 'Healthy' &&
+          app.status.operationState != null
     trigger.on-sync-succeeded: |
       - description: Application syncing has succeeded
         send:
@@ -3460,8 +3494,9 @@ notifications:
       triggers:
         - on-sync-failed
 #        - on-sync-running
-        - on-sync-succeeded
+#        - on-sync-succeeded
         - test-notification
+        - on-deployed
   
   
   
