@@ -3371,7 +3371,7 @@ notifications:
       slack:
         attachments: |
           [{
-            "title": "{{.app.metadata.name}} 배포 성공 🎉",
+            "title": "{{.app.metadata.name}} 배포 성공",
             "color": "good",
             "fields": [
               {
@@ -3464,6 +3464,8 @@ notifications:
       - description: Application is synced and healthy after any operation.
         send:
           - app-deployed
+        oncePer: 
+          - app.metadata.generation
         when: |
           app.status.operationState.phase == 'Succeeded' &&
           app.status.health.status == 'Healthy' &&
