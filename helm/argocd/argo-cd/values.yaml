@@ -3373,23 +3373,6 @@ notifications:
           [{
             "title": "{{.app.metadata.name}} 배포 성공",
             "color": "good",
-            "fields": [
-              {
-                "title": "동기화 상태",
-                "value": "{{.app.status.sync.status}}",
-                "short": true
-              },
-              {
-                "title": "헬스 상태", 
-                "value": "{{.app.status.health.status}}",
-                "short": true
-              },
-              {
-                "title": "리비전",
-                "value": "{{.app.status.sync.revision}}",
-                "short": true
-              }
-            ]
           }]
 
     template.app-sync-failed: |
@@ -3457,7 +3440,10 @@ notifications:
       - description: Application is synced and healthy after any operation.
         send:
         - app-deployed
-        when: app.status.operationState.phase == 'Succeeded'
+        when: |
+          app.status.operationState.phase == 'Succeeded' and
+          app.status.health.status != 'Healthy'
+
 
     trigger.on-sync-failed: |
       - description: Application syncing has failed
