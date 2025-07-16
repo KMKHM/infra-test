@@ -7,8 +7,8 @@ spec:
   project: default
   source:
     chart: kube-prometheus-stack
-    repoURL: https://prometheus-community.github.io/helm-charts
-    targetRevision: 58.2.0
+    repoURL: https://github.com/KMKHM/infra-test
+    targetRevision: helm/prometheus/prometheus-application.yaml
     helm:
       values: |
         prometheusOperator:
