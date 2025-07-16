@@ -29,6 +29,11 @@ spec:
                   resources:
                     requests:
                       storage: 8Gi
+          service:
+            type: NodePort
+            port: 9090
+            targetPort: 9090
+            nodePort: 30090
         
         grafana:
           enabled: true
@@ -37,6 +42,11 @@ spec:
             storageClassName: local-path
             size: 10Gi
           adminPassword: admin123
+          service:
+            type: NodePort
+            port: 80
+            targetPort: 3000
+            nodePort: 30300
         
         alertmanager:
           enabled: true
@@ -50,6 +60,11 @@ spec:
                   resources:
                     requests:
                       storage: 2Gi
+          service:
+            type: NodePort
+            port: 9093
+            targetPort: 9093
+            nodePort: 30093
         
         kubeApiServer:
           enabled: true
