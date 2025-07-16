@@ -6,8 +6,8 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://prometheus-community.github.io/helm-charts
     chart: kube-prometheus-stack
+    repoURL: https://prometheus-community.github.io/helm-charts
     targetRevision: 58.2.0
     helm:
       values: |
@@ -24,5 +24,14 @@ spec:
     automated:
       prune: true
       selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
+  ignoreDifferences:
+    - group: ""
+      kind: ConfigMap
+      namespace: monitoring
+      jsonPointers:
+        - /data
+    - group: ""
+      kind: Secret
+      namespace: monitoring
+      jsonPointers:
+        - /data
