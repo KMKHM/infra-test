@@ -8,7 +8,8 @@ spec:
   source:
     chart: kube-prometheus-stack
     repoURL: https://github.com/KMKHM/infra-test
-    targetRevision: helm/prometheus/prometheus-application.yaml
+    path: helm/prometheus/kube-prometheus-stack
+    targetRevision: HEAD
     helm:
       values: |
         prometheusOperator:
