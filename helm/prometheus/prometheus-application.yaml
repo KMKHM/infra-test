@@ -3,18 +3,20 @@ kind: Application
 metadata:
   name: prometheus-app
   namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "1"
-
 spec:
   project: default
   source:
-    repoURL: https://github.com/KMKHM/infra-test
-    path: helm/prometheus/kube-prometheus-stack
-    targetRevision: HEAD
+    repoURL: https://prometheus-community.github.io/helm-charts
+    chart: kube-prometheus-stack
+    targetRevision: 58.2.0
     helm:
-      valueFiles:
-        - values.yaml
+      values: |
+        prometheus:
+          enabled: true
+        grafana:
+          enabled: true
+        alertmanager:
+          enabled: true
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
@@ -23,9 +25,4 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
-      - ServerSideApply=true
       - CreateNamespace=true
-      - Replace=true
-      - Force=true
-      - ApplyOutOfSyncOnly=true
-      - PruneLast=true
