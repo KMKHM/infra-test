@@ -19,72 +19,32 @@ spec:
         
         prometheus:
           enabled: true
-          prometheusSpec:
-            retention: 15d
-            storageSpec:
-              volumeClaimTemplate:
-                spec:
-                  storageClassName: local-path
-                  accessModes: ["ReadWriteOnce"]
-                  resources:
-                    requests:
-                      storage: 8Gi
           service:
             type: NodePort
-            port: 9090
-            targetPort: 9090
             nodePort: 30090
+          prometheusSpec:
+            retention: 7d
+            # 스토리지 설정 제거 (기본값 사용)
         
         grafana:
           enabled: true
-          persistence:
-            enabled: true
-            storageClassName: local-path
-            size: 10Gi
           adminPassword: admin123
           service:
             type: NodePort
-            port: 80
-            targetPort: 3000
             nodePort: 30300
+          # 퍼시스턴트 볼륨 제거 (기본값 사용)
         
         alertmanager:
           enabled: true
-          alertmanagerSpec:
-            retention: 72h
-            storage:
-              volumeClaimTemplate:
-                spec:
-                  storageClassName: local-path
-                  accessModes: ["ReadWriteOnce"]
-                  resources:
-                    requests:
-                      storage: 2Gi
           service:
             type: NodePort
-            port: 9093
-            targetPort: 9093
             nodePort: 30093
+          # 스토리지 설정 제거 (기본값 사용)
         
-        kubeApiServer:
-          enabled: true
-        kubelet:
-          enabled: true
-        kubeControllerManager:
-          enabled: true
-        coreDns:
-          enabled: true
-        kubeEtcd:
-          enabled: true
-        kubeScheduler:
-          enabled: true
-        kubeProxy:
-          enabled: true
         kubeStateMetrics:
           enabled: true
         nodeExporter:
           enabled: true
-        
         defaultRules:
           create: true
 
@@ -97,3 +57,4 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - Replace=true
