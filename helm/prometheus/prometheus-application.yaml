@@ -6,7 +6,6 @@ metadata:
 spec:
   project: default
   source:
-    chart: kube-prometheus-stack
     repoURL: https://github.com/KMKHM/infra-test
     path: helm/prometheus/kube-prometheus-stack
     targetRevision: HEAD
