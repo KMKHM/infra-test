@@ -11,19 +11,12 @@ spec:
     targetRevision: 58.2.0
     helm:
       values: |
-        # 🔥 Prometheus Operator 충돌 방지 설정
         prometheusOperator:
           admissionWebhooks:
-            enabled: false  # Admission Webhook 완전 비활성화
-            patch:
-              enabled: false
+            enabled: false
           tls:
-            enabled: false  # TLS 비활성화로 충돌 방지
+            enabled: false
         
-        # 🔥 전역 설정
-        namespaceOverride: "monitoring"
-        
-        # 🔥 기본 컴포넌트 설정
         prometheus:
           enabled: true
           prometheusSpec:
@@ -31,31 +24,33 @@ spec:
             storageSpec:
               volumeClaimTemplate:
                 spec:
+                  storageClassName: local-path
                   accessModes: ["ReadWriteOnce"]
                   resources:
                     requests:
-                      storage: 10Gi
+                      storage: 8Gi
         
         grafana:
           enabled: true
           persistence:
             enabled: true
-            size: 5Gi
+            storageClassName: local-path
+            size: 10Gi
           adminPassword: admin123
         
         alertmanager:
           enabled: true
           alertmanagerSpec:
-            retention: 168h
+            retention: 72h
             storage:
               volumeClaimTemplate:
                 spec:
+                  storageClassName: local-path
                   accessModes: ["ReadWriteOnce"]
                   resources:
                     requests:
-                      storage: 5Gi
+                      storage: 2Gi
         
-        # 🔥 충돌 방지를 위한 추가 설정
         kubeApiServer:
           enabled: true
         kubelet:
@@ -75,35 +70,8 @@ spec:
         nodeExporter:
           enabled: true
         
-        # 🔥 리소스 제한 설정
         defaultRules:
           create: true
-          rules:
-            alertmanager: true
-            etcd: true
-            configReloaders: true
-            general: true
-            k8s: true
-            kubeApiserverAvailability: true
-            kubeApiserverBurnrate: true
-            kubeApiserverHistogram: true
-            kubeApiserverSlos: true
-            kubelet: true
-            kubeProxy: true
-            kubePrometheusGeneral: true
-            kubePrometheusNodeRecording: true
-            kubernetesApps: true
-            kubernetesResources: true
-            kubernetesStorage: true
-            kubernetesSystem: true
-            kubeScheduler: true
-            kubeStateMetrics: true
-            network: true
-            node: true
-            nodeExporterAlerting: true
-            nodeExporterRecording: true
-            prometheus: true
-            prometheusOperator: true
 
   destination:
     server: https://kubernetes.default.svc
@@ -114,48 +82,3 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      - ServerSideApply=true  # 🔥 서버사이드 적용으로 충돌 방지
-      - ApplyOutOfSyncOnly=true  # 🔥 변경된 것만 적용
-      - PrunePropagationPolicy=foreground  # 🔥 안전한 삭제
-      - PruneLast=true  # 🔥 마지막에 정리
-  ignoreDifferences:
-    - group: ""
-      kind: ConfigMap
-      namespace: monitoring
-      jsonPointers:
-        - /data
-    - group: ""
-      kind: Secret
-      namespace: monitoring
-      jsonPointers:
-        - /data
-    # 🔥 Admission Webhook 관련 리소스 무시
-    - group: "admissionregistration.k8s.io"
-      kind: ValidatingAdmissionWebhook
-      jsonPointers:
-        - /webhooks
-    - group: "admissionregistration.k8s.io"
-      kind: MutatingAdmissionWebhook
-      jsonPointers:
-        - /webhooks
-
-    - group: "rbac.authorization.k8s.io"
-      kind: ClusterRole
-      jsonPointers:
-        - /rules
-    - group: "rbac.authorization.k8s.io"
-      kind: ClusterRoleBinding
-      jsonPointers:
-        - /subjects
-    - group: "rbac.authorization.k8s.io"
-      kind: Role
-      jsonPointers:
-        - /rules
-    - group: "rbac.authorization.k8s.io"
-      kind: RoleBinding
-      jsonPointers:
-        - /subjects
-    - group: "apiextensions.k8s.io"
-      kind: CustomResourceDefinition
-      jsonPointers:
-        - /spec/conversion/webhook/clientConfig/caBundle
