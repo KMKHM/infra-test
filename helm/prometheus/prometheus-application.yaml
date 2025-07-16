@@ -4,12 +4,12 @@ metadata:
   name: prometheus-app
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "1"  # 다른 앱보다 먼저 배포
+    argocd.argoproj.io/sync-wave: "1"
 
 spec:
   project: default
   source:
-    repoURL: https://github.com/KMKHM/infra-test  # 본인의 Git 저장소 URL
+    repoURL: https://github.com/KMKHM/infra-test
     path: helm/prometheus/kube-prometheus-stack
     targetRevision: HEAD
     helm:
@@ -24,5 +24,8 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      - ServerSideApply=true  # CRD 관리에 필요
-      - Replace=true          # 리소스 충돌 시 교체
+      - ServerSideApply=true
+      - Replace=true
+      - Force=true
+      - ApplyOutOfSyncOnly=true
+      - PruneLast=true
