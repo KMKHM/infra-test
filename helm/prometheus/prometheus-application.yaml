@@ -45,6 +45,9 @@ spec:
             accessModes:
               - ReadWriteOnce
             size: 5Gi
+          sidecar:
+            dashboards:
+              enabled: false
 
         alertmanager:
           enabled: true
