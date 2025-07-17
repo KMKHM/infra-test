@@ -16,7 +16,7 @@ spec:
             enabled: false
           tls:
             enabled: false
-        
+
         prometheus:
           enabled: true
           service:
@@ -24,23 +24,43 @@ spec:
             nodePort: 30090
           prometheusSpec:
             retention: 7d
-            # 스토리지 설정 제거 (기본값 사용)
-        
+            storageSpec:
+              volumeClaimTemplate:
+                spec:
+                  storageClassName: "local-path"
+                  accessModes: ["ReadWriteOnce"]
+                  resources:
+                    requests:
+                      storage: 2Gi
+
         grafana:
           enabled: true
           adminPassword: admin123
           service:
             type: NodePort
             nodePort: 30300
-          # 퍼시스턴트 볼륨 제거 (기본값 사용)
-        
+          persistence:
+            enabled: true
+            storageClassName: "local-path"
+            accessModes:
+              - ReadWriteOnce
+            size: 1Gi
+
         alertmanager:
           enabled: true
           service:
             type: NodePort
             nodePort: 30093
-          # 스토리지 설정 제거 (기본값 사용)
-        
+          alertmanagerSpec:
+            storage:
+              volumeClaimTemplate:
+                spec:
+                  storageClassName: "local-path"
+                  accessModes: ["ReadWriteOnce"]
+                  resources:
+                    requests:
+                      storage: 1Gi
+
         kubeStateMetrics:
           enabled: true
         nodeExporter:
@@ -51,6 +71,7 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
+
   syncPolicy:
     automated:
       prune: true
@@ -58,3 +79,15 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - Replace=true
+
+  ignoreDifferences:
+    - group: ""
+      kind: ConfigMap
+      namespace: monitoring
+      jsonPointers:
+        - /data
+    - group: ""
+      kind: Secret
+      namespace: monitoring
+      jsonPointers:
+        - /data
