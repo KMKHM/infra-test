@@ -44,7 +44,7 @@ spec:
             storageClassName: "local-path"
             accessModes:
               - ReadWriteOnce
-            size: 1Gi
+            size: 5Gi
 
         alertmanager:
           enabled: true
