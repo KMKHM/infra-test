@@ -40,6 +40,8 @@ spec:
           service:
             type: NodePort
             nodePort: 30300
+          initChownData:
+            enabled: false
           persistence:
             enabled: true
             storageClassName: "local-path"
@@ -49,8 +51,10 @@ spec:
           sidecar:
             dashboards:
               enabled: false
-          initChownData:
-            enabled: false
+          securityContext:
+            runAsUser: 472
+            runAsGroup: 472
+            fsGroup: 472
 
         alertmanager:
           enabled: true
