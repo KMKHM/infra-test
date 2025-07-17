@@ -91,3 +91,8 @@ spec:
       namespace: monitoring
       jsonPointers:
         - /data
+    - group: ""
+      kind: PersistentVolumeClaim
+      namespace: monitoring
+      jsonPointers:
+        - /spec
