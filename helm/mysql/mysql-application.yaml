@@ -1,4 +1,3 @@
-
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -7,25 +6,27 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/KMKHM/infra-test  # 자체 Git 저장소
-    path: helm/mysql/mysql-chart                  # 로컬 차트 경로
-    targetRevision: HEAD
+    repoURL: https://charts.bitnami.com/bitnami
+    chart: mysql
+    targetRevision: 9.23.0
     helm:
       values: |
-        mysql:
-          rootPassword: "mysql-root-password"
-          database: "myapp"
-          user: "myuser"
-          password: "mypassword"
+        auth:
+          rootPassword: mysql-root-password
+          database: myapp
+          username: myuser
+          password: mypassword
         
-        persistence:
-          enabled: true
-          storageClass: "local-path"
-          size: 20Gi
+        primary:
+          service:
+            type: NodePort
+            nodePorts:
+              mysql: 30306
         
-        service:
-          type: NodePort
-          nodePort: 30306
+          persistence:
+            enabled: true
+            storageClass: "local-path"
+            size: 8Gi
 
   destination:
     server: https://kubernetes.default.svc
@@ -37,4 +38,3 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      - ServerSideApply=true
