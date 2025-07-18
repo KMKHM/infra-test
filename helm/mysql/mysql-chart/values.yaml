@@ -17,7 +17,7 @@ env:
   - name: MYSQL_PASSWORD
     value: "mypassword"
 
-# ServiceAccount 설정 (필수!)
+# ServiceAccount 설정
 serviceAccount:
   create: true
   automount: true
@@ -31,6 +31,18 @@ service:
   targetPort: 3306
   nodePort: 30306
 
+# Ingress 설정
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: mysql.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
 # 기본 설정들
 nameOverride: ""
 fullnameOverride: ""
@@ -38,16 +50,66 @@ fullnameOverride: ""
 podAnnotations: {}
 podLabels: {}
 
-podSecurityContext: {}
-securityContext: {}
+podSecurityContext:
+  fsGroup: 999
 
-resources: {}
+securityContext:
+  runAsUser: 999
+  runAsGroup: 999
+  runAsNonRoot: true
 
+resources:
+  limits:
+    memory: "1Gi"
+    cpu: "500m"
+  requests:
+    memory: "512Mi"
+    cpu: "250m"
+
+# 라이브니스 및 레디니스 프로브
+livenessProbe:
+  exec:
+    command:
+      - sh
+      - -c
+      - "mysqladmin ping -u root -p$MYSQL_ROOT_PASSWORD"
+  initialDelaySeconds: 30
+  timeoutSeconds: 5
+  periodSeconds: 10
+  failureThreshold: 3
+
+readinessProbe:
+  exec:
+    command:
+      - sh
+      - -c
+      - "mysqladmin ping -u root -p$MYSQL_ROOT_PASSWORD"
+  initialDelaySeconds: 5
+  timeoutSeconds: 1
+  periodSeconds: 5
+  failureThreshold: 3
+
+# Auto Scaling 설정
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+# 볼륨 설정
+volumes: []
+volumeMounts: []
+
+# 노드 선택 및 할당
 nodeSelector: {}
 tolerations: []
 affinity: {}
 
-# MySQL 볼륨 설정 (선택사항)
+# 네트워크 정책
+networkPolicy:
+  enabled: false
+
+# MySQL 볼륨 설정
 persistence:
   enabled: true
   storageClass: "local-path"
