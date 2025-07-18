@@ -1,0 +1,40 @@
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: mysql-app
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/KMKHM/infra-test  # 자체 Git 저장소
+    path: helm/mysql/mysql-chart                  # 로컬 차트 경로
+    targetRevision: HEAD
+    helm:
+      values: |
+        mysql:
+          rootPassword: "mysql-root-password"
+          database: "myapp"
+          user: "myuser"
+          password: "mypassword"
+        
+        persistence:
+          enabled: true
+          storageClass: "local-path"
+          size: 20Gi
+        
+        service:
+          type: NodePort
+          nodePort: 30306
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: mysql
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
