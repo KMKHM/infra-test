@@ -38,17 +38,17 @@ env:
     valueFrom:
       secretKeyRef:
         name: cicd-test-app-db-secret
-        key: url
+        key: "jdbc:mysql://mysql-app-mysql.mysql.svc.cluster.local:3306/myapp?useSSL=false&allowPublicKeyRetrieval=true"
   - name: SPRING_DATASOURCE_USERNAME
     valueFrom:
       secretKeyRef:
         name: cicd-test-app-db-secret
-        key: username
+        key: root
   - name: SPRING_DATASOURCE_PASSWORD
     valueFrom:
       secretKeyRef:
         name: cicd-test-app-db-secret
-        key: password
+        key: mysql-root-password
   - name: SPRING_DATASOURCE_DRIVER_CLASS_NAME
     value: "com.mysql.cj.jdbc.Driver"
 
