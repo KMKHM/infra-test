@@ -27,30 +27,16 @@ service:
 ingress:
   enabled: false
 
-# 🔐 Secret에서 환경변수 가져오기
-envFrom:
-  - secretRef:
-      name: cicd-test-app-db-secret
-
-# 또는 개별 환경변수로 설정
 env:
   - name: SPRING_DATASOURCE_URL
-    valueFrom:
-      secretKeyRef:
-        name: cicd-test-app-db-secret
-        key: "jdbc:mysql://mysql-app-mysql.mysql.svc.cluster.local:3306/myapp?useSSL=false&allowPublicKeyRetrieval=true"
+    value: "jdbc:mysql://mysql-app-mysql.mysql.svc.cluster.local:3306/myapp?useSSL=false&allowPublicKeyRetrieval=true"
   - name: SPRING_DATASOURCE_USERNAME
-    valueFrom:
-      secretKeyRef:
-        name: cicd-test-app-db-secret
-        key: root
+    value: "root"
   - name: SPRING_DATASOURCE_PASSWORD
-    valueFrom:
-      secretKeyRef:
-        name: cicd-test-app-db-secret
-        key: mysql-root-password
+    value: "mysql-root-password"
   - name: SPRING_DATASOURCE_DRIVER_CLASS_NAME
     value: "com.mysql.cj.jdbc.Driver"
+
 
 resources: {}
 livenessProbe:
