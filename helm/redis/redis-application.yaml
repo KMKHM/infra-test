@@ -1,0 +1,81 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: redis-app
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://charts.bitnami.com/bitnami
+    chart: redis
+    targetRevision: 19.0.0
+    helm:
+      values: |
+        # Redis 인증 설정
+        auth:
+          enabled: true
+          password: redis-password
+        
+        # Master 설정
+        master:
+          service:
+            type: NodePort
+            nodePorts:
+              redis: 30379
+        
+          persistence:
+            enabled: true
+            storageClass: "local-path"
+            size: 8Gi
+            accessModes:
+              - ReadWriteOnce
+        
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+        
+        # Replica 설정 (읽기 전용)
+        replica:
+          replicaCount: 1
+          service:
+            type: NodePort
+            nodePorts:
+              redis: 30380
+        
+          persistence:
+            enabled: true
+            storageClass: "local-path"
+            size: 8Gi
+            accessModes:
+              - ReadWriteOnce
+        
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+        
+        # 메트릭 설정
+        metrics:
+          enabled: true
+          service:
+            type: NodePort
+            port: 9121
+            nodePort: 30381
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: redis
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
