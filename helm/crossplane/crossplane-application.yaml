@@ -1,0 +1,52 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: crossplane-app
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://charts.crossplane.io/stable
+    chart: crossplane
+    targetRevision: 1.20.0  # 최신 stable 버전
+    helm:
+      values: |
+        # Crossplane 1.20 설정
+        resourcesCrossplane:
+          limits:
+            cpu: 100m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+        
+        # RBAC 설정
+        rbacManager:
+          deploy: true
+          managementPolicy: All
+        
+        # 메트릭 수집
+        metrics:
+          enabled: true
+        
+        # Package Manager 설정 (1.20에서 개선됨)
+        packageCache:
+          sizeLimit: 20Mi
+          medium: Memory
+        
+        # 새로운 기능들 (1.20+)
+        args:
+          - --enable-composition-revisions
+          - --enable-usages
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: crossplane-practice
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
