@@ -6,7 +6,7 @@ spec:
   forProvider:
     region: ap-northeast-2
     ami: ami-0662f4965dfc70aca
-    instanceType: t3.micro
-#    associatePublicIpAddress: true # 퍼블릭 IP 자동 할당 (생략해도 기본 true)
+    instanceType: t2.micro
+    subnetId: subnet-0fc71f2d0988a45c3
   providerConfigRef:
     name: default
