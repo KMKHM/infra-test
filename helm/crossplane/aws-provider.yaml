@@ -1,6 +1,7 @@
+# upjet-aws-provider.yaml
 apiVersion: pkg.crossplane.io/v1
 kind: Provider
 metadata:
-  name: provider-aws-ec2
+  name: provider-upjet-aws
 spec:
-  package: xpkg.upbound.io/upbound/provider-aws-ec2:v1.23.2
+  package: xpkg.upbound.io/crossplane-contrib/provider-upjet-aws:v0.56.0
