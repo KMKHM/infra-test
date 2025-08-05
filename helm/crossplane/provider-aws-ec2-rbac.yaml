@@ -4,7 +4,10 @@ metadata:
   name: provider-aws-ec2-cluster-role
 rules:
   - apiGroups: ["aws.upbound.io"]
-    resources: ["providerconfigs", "providerconfigs/status"]
+    resources:
+      - providerconfigs
+      - providerconfigs/status
+      - providerconfigusages
     verbs: ["get", "list", "watch"]
 
 ---
