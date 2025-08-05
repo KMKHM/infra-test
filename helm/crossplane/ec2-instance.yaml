@@ -1,0 +1,19 @@
+apiVersion: ec2.aws.crossplane.io/v1alpha1
+kind: Instance
+metadata:
+  name: sample-instance
+spec:
+  forProvider:
+    region: ap-northeast-2
+    imageId: ami-0dc2d3e4c0f9ebd18
+    instanceType: t3.micro
+    blockDeviceMappings:
+      - deviceName: /dev/sdx
+        ebs:
+          volumeSize: 30
+#    securityGroupIds:
+#      - default
+#    subnetId:
+#      name: subnet-xxxxxxxx
+  providerConfigRef:
+    name: default
